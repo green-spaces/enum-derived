@@ -6,7 +6,7 @@ license = "MIT"
 edition = "2021"
 repository = "https://github.com/green-spaces/enum-derived"
 documentation = "https://docs.rs/enum-derived"
-keywords = ["random enum", "random", "rand enum"]
+keywords = ["enum", "random"]
 readme = "crates-io.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
