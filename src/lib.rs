@@ -18,7 +18,7 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
 
     let variants = match input.data {
         syn::Data::Enum(data) => data.variants.into_iter().collect::<Vec<_>>(),
-        _ => panic!("Only enums are supported"),
+        _ => panic!("Only enums with unit-like variants are supported"),
     };
 
     let expanded = quote! {

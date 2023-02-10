@@ -5,4 +5,5 @@ fn tests() {
     t.pass("tests/rand/02-rand_function_exists.rs");
     t.pass("tests/rand/03-returns_every_variant.rs");
     t.pass("tests/rand/04-hygiene.rs");
+    t.compile_fail("tests/rand/05-fail-for-struct.rs");
 }
