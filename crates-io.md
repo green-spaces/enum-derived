@@ -1,6 +1,6 @@
 <!-- Enum-Derived readme rendered on crates.io -->
 
-## Enum-Derived adds new functionality to unit-like enums
+# Enum-Derived adds new functionality to unit-like enums
 
 ---
 
