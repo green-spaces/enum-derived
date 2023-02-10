@@ -21,6 +21,10 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
         _ => panic!("Only enums with unit-like variants are supported"),
     };
 
+    if variants.is_empty() {
+        panic!("Enum must have at least one variant defined");
+    }
+
     let expanded = quote! {
         impl #name {
             pub fn rand() -> Self {
