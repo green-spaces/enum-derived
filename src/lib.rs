@@ -1,10 +1,15 @@
+#![doc = include_str!("../crates-io.md")]
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput};
 
-/// Rand creates an associated rand method that returns a random variant of the enum when called
+/// [Rand] creates an associated rand method that returns a random variant of the enum when called
+///
+/// # Note
+///
+/// [Rand] only supports unit-like enums
 #[proc_macro_derive(Rand)]
 pub fn random_enum(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
