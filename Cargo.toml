@@ -1,12 +1,12 @@
 [package]
 name = "enum-derived"
 description = "Add new functionality to unit-like enums"
-version = "0.2.2"
+version = "0.2.3"
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/green-spaces/enum-derived"
 documentation = "https://docs.rs/enum-derived"
-keywords = ["enum", "random"]
+keywords = ["enum", "random", "macro", "testing"]
 readme = "crates-io.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
