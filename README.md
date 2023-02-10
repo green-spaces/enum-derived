@@ -1,2 +1,2 @@
 # enum-derived
-Derive new functionality for rust macros
+Derive new functionality for rust enums
