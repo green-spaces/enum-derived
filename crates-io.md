@@ -3,7 +3,7 @@
 # Enum-Derived adds new functionality to unit-like enums
 
 [![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
-![Build](https://github.com/github/docs/actions/workflows/rust.yml/badge.svg?branch=main)
+![Build](https://github.com/green-spaces/enum-derived/actions/workflows/rust.yml/badge.svg?branch=main)
 ---
 
 You may be looking for:
