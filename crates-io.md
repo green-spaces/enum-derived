@@ -2,6 +2,8 @@
 
 # Enum-Derived adds new functionality to unit-like enums
 
+[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
+
 ---
 
 You may be looking for:
