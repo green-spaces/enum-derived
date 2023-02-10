@@ -1,7 +1,9 @@
 <!-- Enum-Derived readme rendered on crates.io -->
 
-## Enum-Derived adds new functionality to unit-like enums
+# Enum-Derived adds new functionality to unit-like enums
 
+[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
+![Build](https://github.com/green-spaces/enum-derived/actions/workflows/build.yml/badge.svg?branch=main)
 ---
 
 You may be looking for:

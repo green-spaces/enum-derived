@@ -1,11 +1,9 @@
+[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
+![Build](https://github.com/green-spaces/enum-derived/actions/workflows/build.yml/badge.svg?branch=main)
+
 # Enum-Derived
 
 Enum-Derived adds new functionality to unit-like enums
-
-[Build Status]: https://img.shields.io/github/actions/workflow/status/green-spaces/enum-derived/rust.yml?branch=main
-[actions]: https://github.com/green-spaces/enum-derived/actions?query=branch%3Amain
-[Latest Version]: https://img.shields.io/crates/v/enum-derived.svg
-[crates.io]: https://crates.io/crates/enum-derived
 
 ---
 
