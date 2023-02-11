@@ -3,7 +3,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput};
+use syn::{parse_macro_input, DeriveInput, Fields};
 
 /// [Rand] creates an associated rand method that returns a random variant of the enum when called
 ///
@@ -23,6 +23,16 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
 
     if variants.is_empty() {
         panic!("Enum must have at least one variant defined");
+    }
+
+    for v in variants.iter() {
+        match &v.fields {
+            Fields::Unit => continue,
+            _e => panic!(
+                "enums with variants containing fields are not supported.\n{}::{} has a field",
+                name, v.ident
+            ),
+        }
     }
 
     let expanded = quote! {
