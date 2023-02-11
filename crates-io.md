@@ -35,7 +35,7 @@ Two examples where the `rand` method is only available in tests.
 
 `Vehicle::rand()` is not available in `main()`
 
-```compile_fail
+```rust compile_fail
 #[cfg(test)]
 use enum_derived::Rand;
 
