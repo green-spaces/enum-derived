@@ -1,0 +1,8 @@
+error: proc-macro derive panicked
+ --> tests/rand/07-fail-for-tuple-enum.rs:3:10
+  |
+3 | #[derive(Rand)]
+  |          ^^^^
+  |
+  = help: message: enums with variants containing fields are not supported.
+          Messages::Letter has a field
