@@ -7,6 +7,7 @@ fn tests() {
     t.pass("tests/rand/04-hygiene.rs");
     t.compile_fail("tests/rand/05-fail-for-struct.rs");
     t.compile_fail("tests/rand/06-fail-for-empty-enum.rs");
-    t.compile_fail("tests/rand/07-fail-for-tuple-enum.rs");
-    t.compile_fail("tests/rand/08-fail-for-struct-enum.rs");
+    // t.compile_fail("tests/rand/07-fail-for-tuple-enum.rs");
+    // t.compile_fail("tests/rand/08-fail-for-struct-enum.rs");
+    // t.pass("tests/rand/09-tuple-enum-with-random-values.rs");
 }

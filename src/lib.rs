@@ -3,7 +3,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Fields};
+use syn::{parse_macro_input, DeriveInput};
 
 /// [Rand] generates random variants of an enum
 ///
@@ -31,28 +31,32 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
         panic!("Enum must have at least one variant defined");
     }
 
-    for v in variants.iter() {
-        match &v.fields {
-            Fields::Unit => continue,
-            _e => panic!(
-                "enums with variants containing fields are not supported.\n{}::{} has a field",
-                name, v.ident
-            ),
-        }
-    }
+    // for v in variants.iter() {
+    //     match &v.fields {
+    //         Fields::Unit => continue,
+    //         _e => panic!(
+    //             "enums with variants containing fields are not supported.\n{}::{} has a field",
+    //             name, v.ident
+    //         ),
+    //     }
+    // }
 
     let expanded = quote! {
         impl #name {
             fn rand() -> Self {
-                use #name::{#(#variants),*};
-                use ::rand::{thread_rng, seq::SliceRandom};
+                use ::rand::{thread_rng, Rng};
 
-                let mut samples = vec![#(#variants),*];
+                let mut discriminates = vec![#( ::std::mem::discriminant(&#name::#variants)),*];
                 let mut rng = thread_rng();
-                samples.shuffle(&mut rng);
-                samples.pop().unwrap()
+                let idx: usize = rng.gen_range(0..discriminates.len());
+                let selected_discriminate = discriminates.swap_remove(idx);
+                match selected_discriminate {
+                    #( x if x == ::std::mem::discriminant(&#name::#variants) => #name::#variants),* ,
+                    _ => panic!("Unreachable"),
+                }
             }
         }
     };
+
     TokenStream::from(expanded)
 }
