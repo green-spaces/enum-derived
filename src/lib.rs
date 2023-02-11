@@ -5,11 +5,17 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput, Fields};
 
-/// [Rand] creates an associated rand method that returns a random variant of the enum when called
+/// [Rand] generates random variants of an enum
 ///
-/// # Note
 ///
-/// [Rand] only supports unit-like enums
+/// [Rand] derives a method with the same signature as this Random trait.
+/// ```
+/// pub trait Random {
+///
+///     /// Generates a random variant of the enum it is implemented for
+///     fn rand() -> Self;
+/// }
+/// ```
 #[proc_macro_derive(Rand)]
 pub fn random_enum(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -37,7 +43,7 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         impl #name {
-            pub fn rand() -> Self {
+            fn rand() -> Self {
                 use #name::{#(#variants),*};
                 use ::rand::{thread_rng, seq::SliceRandom};
 
