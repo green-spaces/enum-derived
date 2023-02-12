@@ -12,6 +12,8 @@ Enum-Derived is a collection of derive macros that extend the functionality of e
 
 Rand allows for a random variant of an enum to be generated. This can be particularly useful when testing and the specific variant isn't important.
 
+The `rand` crates `rand::random` method must have an implementation  for each type used in a variant to be able to generate the enum.
+
 ```rust
 use enum_derived::Rand;
 
@@ -22,7 +24,7 @@ pub enum Example {
     Character(char),
     Boolean(bool),
     FloatingPoint(f32, f64),
-    Arrays([u8; 32]),
+    MaximumArrayLength([u8; 32]),
     LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
     Options(Option<char>),
 }
