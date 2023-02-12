@@ -11,4 +11,5 @@ fn tests() {
     // t.compile_fail("tests/rand/08-fail-for-struct-enum.rs");
     t.pass("tests/rand/09-tuple-enum-with-random-values.rs");
     t.pass("tests/rand/10-struct-enum-success.rs");
+    t.pass("tests/rand/11-custom-rand-function.rs");
 }
