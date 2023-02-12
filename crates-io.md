@@ -17,7 +17,7 @@ The `rand` crates `rand::random` method must have an implementation  for each ty
 ```rust
 use enum_derived::Rand;
 
-#[derive(Rand, Debug)]
+#[derive(Rand)]
 pub enum Example {
     Empty,
     Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
@@ -27,13 +27,14 @@ pub enum Example {
     MaximumArrayLength([u8; 32]),
     LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
     Options(Option<char>),
+    NamedFields {
+        hello: u8,
+        world: bool,
+    },
 }
 
 fn main() {
-
     let example = Example::rand();
-
-    println!("Example: ${example:?}");
 }
 ```
 
