@@ -3,7 +3,7 @@
 
 # Enum-Derived
 
-Enum-Derived adds new functionality to unit-like enums
+Enum-Derived adds new functionality to enums through derive macros
 
 ---
 
