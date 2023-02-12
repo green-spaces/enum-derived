@@ -2,9 +2,9 @@ use enum_derived::Rand;
 
 #[derive(Rand)]
 pub enum Messages {
-    Email,
+    Email(Vec<u8>),
     Letter(String),
-    Bil,
+    Bill,
 }
 
 fn main() {}

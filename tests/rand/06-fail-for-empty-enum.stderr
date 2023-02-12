@@ -1,7 +1,7 @@
 error: proc-macro derive panicked
  --> tests/rand/06-fail-for-empty-enum.rs:3:10
   |
-3 | #[derive(Rand, PartialEq, Eq, Hash, Debug)]
+3 | #[derive(Rand)]
   |          ^^^^
   |
   = help: message: Enum must have at least one variant defined

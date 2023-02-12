@@ -1,14 +1,12 @@
-#![doc = include_str!("../crates-io.md")]
+#![doc = include_str!("../README.md")]
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput, Fields};
 
-/// [Rand] generates random variants of an enum
+/// [Rand] derives a `Self::rand` method with the same signature as this Random trait.
 ///
-///
-/// [Rand] derives a method with the same signature as this Random trait.
 /// ```
 /// pub trait Random {
 ///
@@ -45,11 +43,20 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
                         })
                     }
                 }
-                _ => {
-                    let fields = v.fields.iter().collect::<Vec<_>>();
+                Fields::Unnamed(unnamed_fields) => {
+                    let fields_types = unnamed_fields.unnamed.iter().map(|f| f.ty.clone()).collect::<Vec<_>>();
                     quote! {
                             ::std::boxed::Box::new(|| {
-                                #name::#var_ident(#(rand::random::<#fields>()),*)
+                                #name::#var_ident(#(::rand::random::<#fields_types>()),*)
+                        })
+                    }
+                }
+                Fields::Named(named_fields) => {
+                    let fields_types = named_fields.named.iter().map(|f| f.ty.clone()).collect::<Vec<_>>();
+                    let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap()).collect::<Vec<_>>();
+                    quote! {
+                            ::std::boxed::Box::new(|| {
+                                #name::#var_ident{ #(#fields_ident: ::rand::random::<#fields_types>()),* }
                         })
                     }
                 }
