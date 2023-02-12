@@ -3,7 +3,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput};
+use syn::{parse_macro_input, DeriveInput, Fields};
 
 /// [Rand] generates random variants of an enum
 ///
@@ -22,38 +22,50 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
 
     let name = input.ident;
 
+    // Support only Enums
     let variants = match input.data {
         syn::Data::Enum(data) => data.variants.into_iter().collect::<Vec<_>>(),
         _ => panic!("Only enums with unit-like variants are supported"),
     };
 
+    // Cannot be an empty veriant
     if variants.is_empty() {
         panic!("Enum must have at least one variant defined");
     }
 
-    // for v in variants.iter() {
-    //     match &v.fields {
-    //         Fields::Unit => continue,
-    //         _e => panic!(
-    //             "enums with variants containing fields are not supported.\n{}::{} has a field",
-    //             name, v.ident
-    //         ),
-    //     }
-    // }
+    let variant_generators = variants
+        .into_iter()
+        .map(|v| {
+            let var_ident = v.ident;
+            match v.fields {
+                Fields::Unit => {
+                    quote! {
+                            ::std::boxed::Box::new(|| {
+                                #name::#var_ident
+                        })
+                    }
+                }
+                _ => {
+                    let fields = v.fields.iter().collect::<Vec<_>>();
+                    quote! {
+                            ::std::boxed::Box::new(|| {
+                                #name::#var_ident(#(rand::random::<#fields>()),*)
+                        })
+                    }
+                }
+            }
+        })
+        .collect::<Vec<_>>();
 
     let expanded = quote! {
         impl #name {
             fn rand() -> Self {
                 use ::rand::{thread_rng, Rng};
 
-                let mut discriminates = vec![#( ::std::mem::discriminant(&#name::#variants)),*];
+                let mut random_enums: Vec<Box<dyn Fn() -> Self>> = vec![#(#variant_generators),*];
                 let mut rng = thread_rng();
-                let idx: usize = rng.gen_range(0..discriminates.len());
-                let selected_discriminate = discriminates.swap_remove(idx);
-                match selected_discriminate {
-                    #( x if x == ::std::mem::discriminant(&#name::#variants) => #name::#variants),* ,
-                    _ => panic!("Unreachable"),
-                }
+                let idx: usize = rng.gen_range(0..random_enums.len());
+                (*random_enums.swap_remove(idx))()
             }
         }
     };

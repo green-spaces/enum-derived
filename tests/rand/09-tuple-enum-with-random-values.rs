@@ -5,19 +5,18 @@ use enum_derived::Rand;
 
 #[derive(Rand)]
 pub enum RandomTypes {
-    // Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
-    // Character(char),
+    Empty,
+    Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
+    Character(char),
     Boolean(bool),
-    // FloatingPoint(f32, f64),
-    // Arrays([u8; 32]),
-    // LongTuple(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64),
-    // Options(Option<char>),
+    FloatingPoint(f32, f64),
+    Arrays([u8; 32]),
+    LongTuple(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64),
+    Options(Option<char>),
 }
 
 fn main() {
-    // let mut seen_variants = HashSet::new();
-    // for _ in 0..200 {
-    //     let rt = RandomTypes::rand();
-    //     seen_variants.insert(std::mem::discriminant(rt));
-    // }
+    for _ in 0..200 {
+        let _rt = RandomTypes::rand();
+    }
 }
