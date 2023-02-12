@@ -16,18 +16,22 @@ Rand allows for a random variant of an enum to be generated. This can be particu
 use enum_derived::Rand;
 
 #[derive(Rand, Debug)]
-pub enum Dna {
-    A,
-    C,
-    T,
-    G
+pub enum Example {
+    Empty,
+    Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
+    Character(char),
+    Boolean(bool),
+    FloatingPoint(f32, f64),
+    Arrays([u8; 32]),
+    LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
+    Options(Option<char>),
 }
 
 fn main() {
 
-    let base = Dna::rand();
+    let example = Example::rand();
 
-    println!("Random Base: ${base:?}");
+    println!("Example: ${example:?}");
 }
 ```
 

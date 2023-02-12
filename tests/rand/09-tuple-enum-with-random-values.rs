@@ -11,7 +11,7 @@ pub enum RandomTypes {
     Boolean(bool),
     FloatingPoint(f32, f64),
     Arrays([u8; 32]),
-    LongTuple(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64),
+    LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
     Options(Option<char>),
 }
 
