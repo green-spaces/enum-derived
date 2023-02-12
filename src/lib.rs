@@ -3,7 +3,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Fields};
+use syn::{parse_macro_input, DeriveInput, Fields, Ident};
 
 /// [Rand] derives a `Self::rand` method with the same signature as this Random trait.
 ///
@@ -14,7 +14,7 @@ use syn::{parse_macro_input, DeriveInput, Fields};
 ///     fn rand() -> Self;
 /// }
 /// ```
-#[proc_macro_derive(Rand)]
+#[proc_macro_derive(Rand, attributes(custom_rand))]
 pub fn random_enum(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
@@ -35,6 +35,20 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
         .into_iter()
         .map(|v| {
             let var_ident = v.ident;
+
+            for attr in v.attrs.iter() {
+                let Some(ident) = attr.path.get_ident() else { continue; };
+                // Allow for custom over ride functions to be used 
+                if ident == "custom_rand" {
+                    let Ok(func_name) = attr.parse_args::<Ident>() else {continue};
+                    return quote! {
+                        ::std::boxed::Box::new(|| {
+                            #func_name()
+                    })
+                };
+                }
+            }
+
             match v.fields {
                 Fields::Unit => {
                     quote! {
