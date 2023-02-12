@@ -30,6 +30,7 @@ fn main() {
         seen_variants.insert(std::mem::discriminant(&rt));
     }
 
+    // The values contained in the variant do not affect the discriminant
     assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::Empty)));
     assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::Boolean(false))));
     assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::FloatingPoint(1.0, 1.0))));
