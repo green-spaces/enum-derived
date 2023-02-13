@@ -16,9 +16,9 @@ use syn::{parse_macro_input, DeriveInput, Fields, Ident};
 ///
 /// ```
 ///
-/// A custom random function, using the `#[custom_rand(func_name)]` can be used for overwrite the default behavior or extend the functionality to types without a default implementation.
+/// A custom function, using the `#[custom_rand(func_name)]` attribute, can be used for overwrite the default behavior or extend the functionality to types without a default implementation.
 ///
-/// The custom function must have a signature of the form `Fn() -> Self` where Self is the enum. It is expected that the custom function will return a single variant but not required.
+/// `func_name` must implement `Fn() -> Self` where Self is the enum. It is expected that the function will return a single variant but is not required.
 ///
 /// # Example
 ///
