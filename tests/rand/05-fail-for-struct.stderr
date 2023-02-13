@@ -1,7 +1,7 @@
 error: proc-macro derive panicked
  --> tests/rand/05-fail-for-struct.rs:3:10
   |
-3 | #[derive(Rand, PartialEq, Eq, Hash, Debug)]
+3 | #[derive(Rand)]
   |          ^^^^
   |
-  = help: message: Only enums with unit-like variants are supported
+  = help: message: Only enums are supported
