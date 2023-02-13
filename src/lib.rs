@@ -13,6 +13,31 @@ use syn::{parse_macro_input, DeriveInput, Fields, Ident};
 ///     /// Generates a random variant of the enum it is implemented for
 ///     fn rand() -> Self;
 /// }
+///
+/// ```
+///
+/// A custom random function, using the `#[custom_rand(func_name)]` can be used for overwrite the default behavior or extend the functionality to types without a default implementation.
+///
+/// The custom function must have a signature of the form `Fn() -> Self` where Self is the enum. It is expected that the custom function will return a single variant but not required.
+///
+/// # Example
+///
+/// ```rust
+/// use enum_derived::Rand;
+///
+/// #[derive(Rand)]
+/// pub enum Example {
+///     Empty,
+///     Boolean(bool),
+///     #[custom_rand(rand_string)]
+///     RandString(String),
+/// }
+///
+/// /// A custom function used for generating the RandString variant
+/// fn rand_string() -> Example {
+///     let unique_str = format!("{:?}", std::time::SystemTime::now());
+///     Example::RandString(unique_str)
+/// }
 /// ```
 #[proc_macro_derive(Rand, attributes(custom_rand))]
 pub fn random_enum(input: TokenStream) -> TokenStream {
@@ -26,7 +51,7 @@ pub fn random_enum(input: TokenStream) -> TokenStream {
         _ => panic!("Only enums with unit-like variants are supported"),
     };
 
-    // Cannot be an empty veriant
+    // Cannot be an empty variant
     if variants.is_empty() {
         panic!("Enum must have at least one variant defined");
     }

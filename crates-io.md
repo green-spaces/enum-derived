@@ -33,7 +33,7 @@ pub enum Example {
     },
     #[custom_rand(rand_string)]
     RandString(String),
-    #[custom_rand(rand_string)]
+    #[custom_rand(rand_vec)]
     RandVec(Vec<u8>),
 }
 
