@@ -31,7 +31,21 @@ pub enum Example {
         hello: u8,
         world: bool,
     },
+    #[custom_rand(rand_string)]
+    RandString(String),
+    #[custom_rand(rand_string)]
+    RandVec(Vec<u8>),
 }
+
+fn rand_string() -> Example {
+    let unique_str = format!("{:?}", std::time::SystemTime::now());
+    Example::RandString(unique_str)
+}
+
+fn rand_vec() -> Example {
+    Example::RandVec(vec![1,2,3,4,5])
+}
+
 
 fn main() {
     let example = Example::rand();
