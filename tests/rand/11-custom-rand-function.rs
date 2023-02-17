@@ -46,4 +46,5 @@ fn main() {
     assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::Empty)));
     assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::Boolean(false))));
     assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::FloatingPoint(1.0, 1.0))));
+    assert!(seen_variants.contains(&std::mem::discriminant(&RandomTypes::Age(0))));
 }

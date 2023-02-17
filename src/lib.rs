@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![forbid(unsafe_code)]
 extern crate proc_macro;
 
 mod rand;
