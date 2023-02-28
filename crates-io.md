@@ -35,6 +35,16 @@ pub enum Example {
     RandString(String),
     #[custom_rand(rand_vec)]
     RandVec(Vec<u8>),
+    /// Occurs three times as often 
+    #[weight(3)]
+    OverWeighted,
+    /// Never yeilded by rand if weight is 0
+    #[weight(0)]
+    NeverOccurs,
+    /// Uses a custom rand function and weighting
+    #[custom_rand(rand_vec)]
+    #[weight(2)]
+    OverWightedRandVec(Vec<u8>),
 }
 
 fn rand_string() -> Example {

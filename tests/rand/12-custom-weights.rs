@@ -14,6 +14,7 @@ pub enum RandomWeights {
     Two,
     #[weight(3)]
     Three,
+    #[custom_rand(|| RandomWeights::Four)]
     #[weight(4)]
     Four,
 }
@@ -21,7 +22,7 @@ pub enum RandomWeights {
 fn main() {
     let mut seen_variants: HashMap<_, i32> = HashMap::new();
 
-    for _ in 0..1000 {
+    for _ in 0..11000 {
         let rt = RandomWeights::rand();
         let counts = seen_variants.entry(std::mem::discriminant(&rt)).or_default();
         *counts += 1;
