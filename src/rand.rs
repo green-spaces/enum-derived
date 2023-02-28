@@ -11,19 +11,24 @@ pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<sy
         panic!("Enum must have at least one variant defined");
     }
 
-    let variant_gen = |v: &Variant| variant_generator(&input.ident, v);
+    let variant_gen = |v: &Variant| variant_rand_func_generator(&input.ident, v);
     let var_rand_funcs = data.variants.iter().map(variant_gen);
+
+    let weights = variant_weights_collector(data.variants.iter().cloned().collect::<Vec<_>>());
 
     let enum_name = &input.ident;
     let expanded = quote! {
         impl #enum_name {
             fn rand() -> Self {
-                use ::rand::{thread_rng, Rng};
+                use ::rand::{thread_rng, Rng, distributions::{WeightedIndex, Distribution}};
 
                 let mut random_enums: Vec<Box<dyn Fn() -> Self>> = vec![#(#var_rand_funcs),*];
+                let enum_weights = vec![#(#weights),*];
+                let dist = WeightedIndex::new(&enum_weights).unwrap();
+
                 let mut rng = thread_rng();
-                let idx: usize = rng.gen_range(0..random_enums.len());
-                (*random_enums.swap_remove(idx))()
+                let enum_idx: usize = dist.sample(&mut rng);
+                (*random_enums.swap_remove(enum_idx))()
             }
         }
     };
@@ -31,7 +36,27 @@ pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<sy
     Ok(TokenStream::from(expanded))
 }
 
-fn variant_generator(enum_name: &Ident, variant: &Variant) -> proc_macro2::TokenStream {
+// Gets the weight cutoff for a variant
+fn variant_weights_collector(variants: Vec<Variant>) -> Vec<proc_macro2::TokenStream> {
+    variants
+        .iter()
+        .map(|v| {
+            for attr in v.attrs.iter() {
+                if attr.path.get_ident().unwrap() == "weight" {
+                    return attr.tokens.clone();
+                }
+            }
+
+            let default_weight = quote! {
+                1
+            };
+            default_weight
+        })
+        .collect()
+}
+
+/// Creates the rand function for a vartiant
+fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_macro2::TokenStream {
     // Check for custom function
     for attr in variant.attrs.iter() {
         let Some(ident) = attr.path.get_ident() else { continue; };
