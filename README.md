@@ -1,6 +1,10 @@
 # Enum-Derived
 
-Enum-Derived is a collection of derive macros that extend the functionality of enums
+Use Enum-Derived's Rand macro to generate random variants of your enums. All fields are populated with independant random value.
+
+Need custom constraints applied to a variant? Use the `#[custom_rand(your_function)]` attribute to override the default behaviour or extend suport to custom types.
+
+Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)]` to change the distribution.
 
 ---
 
@@ -16,27 +20,26 @@ use enum_derived::Rand;
 #[derive(Rand)]
 pub enum Example {
     Empty,
-    Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
-    Character(char),
     Boolean(bool),
-    FloatingPoint(f32, f64),
-    MaximumArrayLength([u8; 32]),
-    LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
-    Options(Option<char>),
     NamedFields {
         hello: u8,
         world: bool,
     },
+    /// Use a custome random function for unsupprorted types (String)
     #[custom_rand(rand_string)]
     RandString(String),
-    #[custom_rand(rand_vec)]
-    RandVec(Vec<u8>),
-    /// Occurs three times as often 
+    /// Occurs three times as often (default weight is one)
     #[weight(3)]
     OverWeighted,
-    /// Never yeilded by rand if weight is 0
+    /// Not randomly generated because it's weight is zero
     #[weight(0)]
     NeverOccurs,
+    Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
+    Character(char),
+    FloatingPoint(f32, f64),
+    MaximumArrayLength([u8; 32]),
+    LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
+    Options(Option<char>),
     /// Uses a custom rand function and weighting
     #[custom_rand(rand_vec)]
     #[weight(2)]
@@ -54,52 +57,5 @@ fn rand_vec() -> Example {
 
 fn main() {
     let example = Example::rand();
-}
-```
-
-Two examples where the `rand` method is only available in tests.
-
-`Vehicle::rand()` is not available in `main()`
-
-```rust compile_fail
-#[cfg(test)]
-use enum_derived::Rand;
-
-#[cfg_attr(test, Rand)]
-#[derive(Debug)]
-pub enum Vehicle {
-    Car,
-    Truck,
-    Motorbike,
-}
-
-fn main() {
-    let vehicle = Vehicle::rand();
-}
-
-```
-
-`Vehicle::rand()` is available in the `tests` module
-
-```rust
-#[cfg(test)]
-use enum_derived::Rand;
-
-#[cfg_attr(test, Rand)]
-#[derive(Debug)]
-pub enum Vehicle {
-    Car,
-    Truck,
-    Motorbike,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn random_vehicle() {
-        let vehicle = Vehicle::rand();
-    }
 }
 ```
