@@ -7,7 +7,6 @@ pub enum NestedExtension {
     Empty,
 }
 
-
 #[derive(Rand)]
 pub enum NestedPath {
     Base,
