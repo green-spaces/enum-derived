@@ -1,5 +1,3 @@
-<!-- Enum-Derived readme rendered on crates.io -->
-
 # Enum-Derived
 
 Use Enum-Derived's Rand macro to generate random variants of your enums. All fields are populated with independant random value.
@@ -8,13 +6,11 @@ Need custom constraints applied to a variant? Use the `#[custom_rand(your_functi
 
 Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)]` to change the distribution.
 
-[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
-![Build](https://github.com/green-spaces/enum-derived/actions/workflows/build.yml/badge.svg?branch=main)
 ---
 
-## Rand
+## Rand Macro
 
-Rand allows for a random variant of an enum to be generated.
+[Rand] allows for a random variant of an enum to be generated. This can be particularly useful when testing and the specific variant isn't important.
 
 The [rand] crates [rand::random] method is used for the default implmentation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionaliy.
 

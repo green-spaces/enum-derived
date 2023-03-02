@@ -1,0 +1,14 @@
+error[E0599]: no variant or associated item named `rand` found for enum `Sample` in the current scope
+ --> tests/rand/14-rand-trait-not-imported.rs:9:22
+  |
+2 | pub enum Sample {
+  | --------------- variant or associated item `rand` not found for this enum
+...
+9 |     let _s = Sample::rand();
+  |                      ^^^^ variant or associated item not found in `Sample`
+  |
+  = help: items from traits can only be used if the trait is in scope
+help: the following trait is implemented but not in scope; perhaps add a `use` for it:
+  |
+1 | use enum_derived::Rand;
+  |

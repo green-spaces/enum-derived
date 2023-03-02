@@ -1,8 +1,8 @@
 error[E0277]: the trait bound `Standard: Distribution<String>` is not satisfied
- --> tests/rand/08-fail-for-struct-enum.rs:7:19
+ --> tests/rand/08-fail-for-struct-enum.rs:3:10
   |
-7 |         contents: String
-  |                   ^^^^^^ the trait `Distribution<String>` is not implemented for `Standard`
+3 | #[derive(Rand)]
+  |          ^^^^ the trait `Distribution<String>` is not implemented for `Standard`
   |
   = help: the following other types implement trait `Distribution<T>`:
             <Standard as Distribution<()>>
@@ -14,8 +14,5 @@ error[E0277]: the trait bound `Standard: Distribution<String>` is not satisfied
             <Standard as Distribution<(A, B, C, D, E, F, G)>>
             <Standard as Distribution<(A, B, C, D, E, F, G, H)>>
           and $N others
-note: required by a bound in `random`
- --> $CARGO/rand-0.8.5/src/lib.rs
-  |
-  | where Standard: Distribution<T> {
-  |                 ^^^^^^^^^^^^^^^ required by this bound in `random`
+  = note: required for `String` to implement `Rand`
+  = note: this error originates in the derive macro `Rand` (in Nightly builds, run with -Z macro-backtrace for more info)
