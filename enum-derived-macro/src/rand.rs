@@ -85,8 +85,7 @@ fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_mac
             let fields_types = unnamed_fields.unnamed.iter().map(|f| &f.ty);
             quote! {
                     ::std::boxed::Box::new(|| {
-                        // #enum_name::#var_ident(#(::rand::random::<#fields_types>()),*)
-                        #enum_name::#var_ident(#(<#fields_types as Rand>::rand()),*)
+                        #enum_name::#var_ident(#(<#fields_types as ::enum_derived::Rand>::rand()),*)
                 })
             }
         }
@@ -95,8 +94,7 @@ fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_mac
             let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
             quote! {
                     ::std::boxed::Box::new(|| {
-                        // #enum_name::#var_ident{ #(#fields_ident: ::rand::random::<#fields_types>()),* }
-                        #enum_name::#var_ident{ #(#fields_ident: <#fields_types as Rand>::rand()),* }
+                        #enum_name::#var_ident{ #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
                 })
             }
         }
