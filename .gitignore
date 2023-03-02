@@ -10,4 +10,4 @@ Cargo.lock
 **/*.rs.bk
 
 # Generated when producing failing to compile test cases
-wip/*
+**/wip/*

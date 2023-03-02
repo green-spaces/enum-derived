@@ -13,4 +13,5 @@ fn tests() {
     t.pass("tests/rand/10-struct-enum-success.rs");
     t.pass("tests/rand/11-custom-rand-function.rs");
     t.pass("tests/rand/12-custom-weights.rs");
+    t.pass("tests/rand/13-recursive-rand.rs");
 }

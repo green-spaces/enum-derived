@@ -18,7 +18,7 @@ pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<sy
 
     let enum_name = &input.ident;
     let expanded = quote! {
-        impl #enum_name {
+        impl ::enum_derived::Rand for #enum_name {
             fn rand() -> Self {
                 use ::rand::{thread_rng, Rng, distributions::{WeightedIndex, Distribution}};
 
@@ -26,8 +26,7 @@ pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<sy
                 let enum_weights = vec![#(#weights),*];
                 let dist = WeightedIndex::new(&enum_weights).unwrap();
 
-                let mut rng = thread_rng();
-                let enum_idx: usize = dist.sample(&mut rng);
+                let enum_idx: usize = dist.sample(&mut thread_rng());
                 (*random_enums.swap_remove(enum_idx))()
             }
         }
@@ -86,7 +85,8 @@ fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_mac
             let fields_types = unnamed_fields.unnamed.iter().map(|f| &f.ty);
             quote! {
                     ::std::boxed::Box::new(|| {
-                        #enum_name::#var_ident(#(::rand::random::<#fields_types>()),*)
+                        // #enum_name::#var_ident(#(::rand::random::<#fields_types>()),*)
+                        #enum_name::#var_ident(#(<#fields_types as Rand>::rand()),*)
                 })
             }
         }
@@ -95,7 +95,8 @@ fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_mac
             let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
             quote! {
                     ::std::boxed::Box::new(|| {
-                        #enum_name::#var_ident{ #(#fields_ident: ::rand::random::<#fields_types>()),* }
+                        // #enum_name::#var_ident{ #(#fields_ident: ::rand::random::<#fields_types>()),* }
+                        #enum_name::#var_ident{ #(#fields_ident: <#fields_types as Rand>::rand()),* }
                 })
             }
         }
