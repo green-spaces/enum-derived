@@ -16,10 +16,16 @@ Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)
 
 Rand allows for a random variant of an enum to be generated.
 
-The `rand` crates `rand::random` method must have an implementation for each type used in a variant to be able to generate the enum. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionaliy.
+The [rand] crates [rand::random] method is used for the default implmentation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionaliy.
 
 ```rust
 use enum_derived::Rand;
+
+#[derive(Rand)]
+pub enum Nest {
+    Bird,
+    Egg,
+}
 
 #[derive(Rand)]
 pub enum Example {
@@ -29,6 +35,8 @@ pub enum Example {
         hello: u8,
         world: bool,
     },
+    /// Nested derivations of Rand are supported
+    Nested(Nest),
     /// Use a custome random function for unsupprorted types (String)
     #[custom_rand(rand_string)]
     RandString(String),
