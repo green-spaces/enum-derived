@@ -18,6 +18,12 @@ The `rand` crates `rand::random` method must have an implementation  for each ty
 use enum_derived::Rand;
 
 #[derive(Rand)]
+pub enum Nest {
+    Bird,
+    Egg,
+}
+
+#[derive(Rand)]
 pub enum Example {
     Empty,
     Boolean(bool),
@@ -25,6 +31,8 @@ pub enum Example {
         hello: u8,
         world: bool,
     },
+    /// Nested derivations of Rand are supported
+    Nested(Nest),
     /// Use a custome random function for unsupprorted types (String)
     #[custom_rand(rand_string)]
     RandString(String),
