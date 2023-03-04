@@ -2,7 +2,9 @@ use enum_derived::Rand;
 
 #[derive(Rand)]
 pub struct Hello {
-    world: String,
+    world: u8,
 }
 
-fn main() {}
+fn main() {
+    let _u = Hello::rand();
+}

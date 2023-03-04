@@ -19,8 +19,8 @@ path = "tests/rand-progress.rs"
 
 [dependencies]
 rand = "0.8.5"
-enum-derived-macro = "0.1.1"
-# enum-derived-macro = { path = "../enum-derived-macro"}
+# enum-derived-macro = "0.1.1"
+enum-derived-macro = { path = "../enum-derived-macro"}
 
 [dev-dependencies]
 trybuild = { version = "1.0.49", features = ["diff"] }

@@ -1,7 +1,0 @@
-error: proc-macro derive panicked
- --> tests/rand/05-fail-for-struct.rs:3:10
-  |
-3 | #[derive(Rand)]
-  |          ^^^^
-  |
-  = help: message: Only enums are supported

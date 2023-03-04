@@ -1,22 +1,80 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{DeriveInput, Fields, Ident, Variant};
+use syn::{Data, DataEnum, DataStruct, DataUnion, DeriveInput, Fields, Ident, Variant};
 
 pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<syn::Error>> {
-    // Support only Enums
-    let syn::Data::Enum(ref data) = input.data else { panic!("Only enums are supported") };
+    // println!("{input:#?}");
 
+    match input.data {
+        Data::Struct(ref data_struct) => expand_derive_rand_struct(&input.ident, data_struct),
+        Data::Enum(ref data_enum) => expand_derive_rand_enum(&input.ident, data_enum),
+        Data::Union(ref data_union) => expand_derive_rand_union(&input.ident, data_union),
+    }
+}
+
+fn expand_derive_rand_struct(
+    struct_name: &Ident,
+    data_struct: &DataStruct,
+) -> Result<TokenStream, Vec<syn::Error>> {
+    // Create rand func for struct
+    let rand_struct_func = match &data_struct.fields {
+        Fields::Unit => {
+            quote! {
+                    ::std::boxed::Box::new(|| {
+                        #struct_name
+                })
+            }
+        }
+        Fields::Unnamed(unnamed_fields) => {
+            let fields_types = unnamed_fields.unnamed.iter().map(|f| &f.ty);
+            quote! {
+                    ::std::boxed::Box::new(|| {
+                        #struct_name(#(<#fields_types as ::enum_derived::Rand>::rand()),*)
+                })
+            }
+        }
+        Fields::Named(named_fields) => {
+            let fields_types = named_fields.named.iter().map(|f| &f.ty);
+            let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
+            quote! {
+                    ::std::boxed::Box::new(|| {
+                        #struct_name { #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
+                })
+            }
+        }
+    };
+
+    let expanded = quote! {
+        impl ::enum_derived::Rand for #struct_name {
+            fn rand() -> Self {
+                #rand_struct_func()
+            }
+        }
+    };
+    Ok(TokenStream::from(expanded))
+}
+
+fn expand_derive_rand_union(
+    _union_name: &Ident,
+    _data_union: &DataUnion,
+) -> Result<TokenStream, Vec<syn::Error>> {
+    panic!("Only enums are supported")
+}
+
+fn expand_derive_rand_enum(
+    enum_name: &Ident,
+    data_enum: &DataEnum,
+) -> Result<TokenStream, Vec<syn::Error>> {
     // Cannot be an empty variant
-    if data.variants.is_empty() {
+    if data_enum.variants.is_empty() {
         panic!("Enum must have at least one variant defined");
     }
 
-    let variant_gen = |v: &Variant| variant_rand_func_generator(&input.ident, v);
-    let var_rand_funcs = data.variants.iter().map(variant_gen);
+    let variant_gen = |v: &Variant| variant_rand_func_generator(enum_name, v);
+    let var_rand_funcs = data_enum.variants.iter().map(variant_gen);
 
-    let weights = variant_weights_collector(data.variants.iter().cloned().collect::<Vec<_>>());
+    let weights = variant_weights_collector(data_enum.variants.iter().cloned().collect::<Vec<_>>());
 
-    let enum_name = &input.ident;
     let expanded = quote! {
         impl ::enum_derived::Rand for #enum_name {
             fn rand() -> Self {
