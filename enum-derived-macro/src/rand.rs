@@ -34,11 +34,31 @@ fn expand_derive_rand_struct(
             }
         }
         Fields::Named(named_fields) => {
-            let fields_types = named_fields.named.iter().map(|f| &f.ty);
+            // let fields_types = named_fields.named.iter().map(|f| &f.ty);
             let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
+            let fields_rand_funcs = named_fields.named.iter().map(|f| {
+                // Use custom_rand if available
+                for attr in f.attrs.iter() {
+                    let Some(ident) = attr.path.get_ident() else { continue; };
+                    // Allow for custom over ride functions to be used
+                    if ident == "custom_rand" {
+                        let Ok(value_func) = attr.parse_args::<Ident>() else {continue};
+                        return quote! {
+                            #value_func
+                        };
+                    }
+                }
+
+                // Default to Rand impl
+                let field_type = &f.ty;
+                quote! {
+                    <#field_type as ::enum_derived::Rand>::rand
+                }
+            });
             quote! {
                     ::std::boxed::Box::new(|| {
-                        #struct_name { #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
+                        // #struct_name { #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
+                        #struct_name { #(#fields_ident: #fields_rand_funcs()),* }
                 })
             }
         }
@@ -58,7 +78,7 @@ fn expand_derive_rand_union(
     _union_name: &Ident,
     _data_union: &DataUnion,
 ) -> Result<TokenStream, Vec<syn::Error>> {
-    panic!("Only enums are supported")
+    panic!("Union types are not supported")
 }
 
 fn expand_derive_rand_enum(

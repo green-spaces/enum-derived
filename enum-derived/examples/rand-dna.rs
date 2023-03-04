@@ -1,16 +1,22 @@
-// use enum_derived::Rand;
+use enum_derived::Rand;
 
-// #[derive(Rand)]
-// struct BoolWrapper {
-//     works: bool,
-// }
+#[derive(Rand)]
+struct BoolWrapper {
+    _works: bool,
+    #[custom_rand(always_false)]
+    _is_rand: bool,
+}
 
-// #[derive(Rand)]
-// pub enum Sample {
-//     Wrapper(BoolWrapper),
-//     NotWrapped,
-// }
+fn always_false() -> bool {
+    false
+}
+
+#[derive(Rand)]
+enum Sample {
+    Wrapper(BoolWrapper),
+    NotWrapped,
+}
 
 fn main() {
-    // let _s = Sample::rand();
+    let _s = Sample::rand();
 }
