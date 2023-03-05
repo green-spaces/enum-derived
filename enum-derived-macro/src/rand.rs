@@ -1,6 +1,8 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DataEnum, DataStruct, DataUnion, DeriveInput, Fields, Ident, Variant};
+use syn::{
+    Attribute, Data, DataEnum, DataStruct, DataUnion, DeriveInput, Field, Fields, Ident, Variant,
+};
 
 pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<syn::Error>> {
     // println!("{input:#?}");
@@ -26,39 +28,20 @@ fn expand_derive_rand_struct(
             }
         }
         Fields::Unnamed(unnamed_fields) => {
-            let fields_types = unnamed_fields.unnamed.iter().map(|f| &f.ty);
+            let fields_rand_generators = unnamed_fields.unnamed.iter().map(get_field_generator);
             quote! {
                     ::std::boxed::Box::new(|| {
-                        #struct_name(#(<#fields_types as ::enum_derived::Rand>::rand()),*)
+                        #struct_name(#(#fields_rand_generators()),*)
                 })
             }
         }
         Fields::Named(named_fields) => {
-            // let fields_types = named_fields.named.iter().map(|f| &f.ty);
             let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
-            let fields_rand_funcs = named_fields.named.iter().map(|f| {
-                // Use custom_rand if available
-                for attr in f.attrs.iter() {
-                    let Some(ident) = attr.path.get_ident() else { continue; };
-                    // Allow for custom over ride functions to be used
-                    if ident == "custom_rand" {
-                        let Ok(value_func) = attr.parse_args::<Ident>() else {continue};
-                        return quote! {
-                            #value_func
-                        };
-                    }
-                }
+            let fields_rand_generators = named_fields.named.iter().map(get_field_generator);
 
-                // Default to Rand impl
-                let field_type = &f.ty;
-                quote! {
-                    <#field_type as ::enum_derived::Rand>::rand
-                }
-            });
             quote! {
                     ::std::boxed::Box::new(|| {
-                        // #struct_name { #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
-                        #struct_name { #(#fields_ident: #fields_rand_funcs()),* }
+                        #struct_name { #(#fields_ident: #fields_rand_generators()),* }
                 })
             }
         }
@@ -74,18 +57,12 @@ fn expand_derive_rand_struct(
     Ok(TokenStream::from(expanded))
 }
 
-fn expand_derive_rand_union(
-    _union_name: &Ident,
-    _data_union: &DataUnion,
-) -> Result<TokenStream, Vec<syn::Error>> {
-    panic!("Union types are not supported")
-}
-
 fn expand_derive_rand_enum(
     enum_name: &Ident,
     data_enum: &DataEnum,
 ) -> Result<TokenStream, Vec<syn::Error>> {
     // Cannot be an empty variant
+    // TODO is this necessary?
     if data_enum.variants.is_empty() {
         panic!("Enum must have at least one variant defined");
     }
@@ -178,4 +155,37 @@ fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_mac
         }
     };
     rand_func
+}
+
+fn get_field_generator(field: &Field) -> proc_macro2::TokenStream {
+    match get_attr_value(&field.attrs, "custom_rand") {
+        Some(ts) => ts,
+        None => {
+            let field_type = &field.ty;
+            quote! {
+                <#field_type as ::enum_derived::Rand>::rand
+            }
+        }
+    }
+}
+
+fn get_attr_value(attrs: &[Attribute], name: &str) -> Option<proc_macro2::TokenStream> {
+    for attr in attrs.iter() {
+        let Some(ident) = attr.path.get_ident() else { continue; };
+        // Allow for custom over ride functions to be used
+        if ident == name {
+            let Ok(value_func) = attr.parse_args::<Ident>() else {continue};
+            return Some(quote! {
+                #value_func
+            });
+        }
+    }
+    None
+}
+
+fn expand_derive_rand_union(
+    _union_name: &Ident,
+    _data_union: &DataUnion,
+) -> Result<TokenStream, Vec<syn::Error>> {
+    panic!("Union types are not supported")
 }
