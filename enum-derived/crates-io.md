@@ -2,9 +2,9 @@
 
 # Enum-Derived
 
-Use Enum-Derived's Rand macro to generate random variants of your enums. All fields are populated with independant random value.
+Use Enum-Derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
 
-Need custom constraints applied to a variant? Use the `#[custom_rand(your_function)]` attribute to override the default behaviour or extend suport to custom types.
+Need custom constraints applied to a variant or field? Use the `#[custom_rand(your_function)]` attribute to override the default behavior or extend support to types without default support.
 
 Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)]` to change the distribution.
 
@@ -14,60 +14,55 @@ Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)
 
 ## Rand
 
-Rand allows for a random variant of an enum to be generated.
+Rand allows for a random variant of an enum, or struct, to be generated.
 
-The [rand] crates [rand::random] method is used for the default implmentation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionaliy.
+The [rand] crates [rand::random] method is used for the default implementation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionality.
 
 ```rust
 use enum_derived::Rand;
 
 #[derive(Rand)]
-pub enum Nest {
-    Bird,
-    Egg,
+struct Weather {
+    wind_speed: u8,
+    #[custom_rand(rand_temp)]
+    temperature: f32,
+    cloudy: bool
 }
 
 #[derive(Rand)]
-pub enum Example {
-    Empty,
-    Boolean(bool),
-    NamedFields {
-        hello: u8,
-        world: bool,
+enum TravelLog {
+    Airplane {
+        weather: Weather,
+        altitude: u16
     },
-    /// Nested derivations of Rand are supported
-    Nested(Nest),
-    /// Use a custome random function for unsupprorted types (String)
-    #[custom_rand(rand_string)]
-    RandString(String),
-    /// Occurs three times as often (default weight is one)
+    Boat(
+        Weather,
+        #[custom_rand()]
+        u32,
+    ),
+    #[custom_rand(always_has_sunroof)]
+    Car {
+        has_sunroof: bool,
+    },
     #[weight(3)]
-    OverWeighted,
-    /// Not randomly generated because it's weight is zero
-    #[weight(0)]
-    NeverOccurs,
-    Integers(u8, u16, u32, u64, usize, i8, i16, i32, i64, isize),
-    Character(char),
-    FloatingPoint(f32, f64),
-    MaximumArrayLength([u8; 32]),
-    LongTuple((u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64)),
-    Options(Option<char>),
-    /// Uses a custom rand function and weighting
-    #[custom_rand(rand_vec)]
-    #[weight(2)]
-    OverWightedRandVec(Vec<u8>),
-}
-
-fn rand_string() -> Example {
-    let unique_str = format!("{:?}", std::time::SystemTime::now());
-    Example::RandString(unique_str)
-}
-
-fn rand_vec() -> Example {
-    Example::OverWightedRandVec(vec![1,2,3,4,5])
+    SpaceShip,
 }
 
 fn main() {
-    let example = Example::rand();
+    let travel_log = TravelLog::rand();
 }
+
+# fn always_has_sunroof() -> TravelLog {
+#     TravelLog::Car { has_sunroof: true }
+# }
+#
+# fn rand_boat_speed() -> u32 {
+#     thread_rng().gen_range(5..50)
+# }
+# 
+# fn rand_temp() -> f32 {
+#    thread_rng().gen_range(-20.0..120.0)
+# }
+# 
+# use rand::{thread_rng, Rng};
 ```
