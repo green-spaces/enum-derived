@@ -1,12 +1,12 @@
 [package]
 name = "enum-derived"
 description = "Easily generate random variants of your enums"
-version = "0.8.0"
+version = "0.8.1"
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/green-spaces/enum-derived"
 documentation = "https://docs.rs/enum-derived"
-keywords = ["enum", "random", "macro", "testing"]
+keywords = ["enum", "random", "rand", "derive", "struct"]
 readme = "crates-io.md"
 
 [package.metadata.docs.rs]

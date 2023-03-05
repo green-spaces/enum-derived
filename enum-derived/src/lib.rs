@@ -3,7 +3,7 @@
 
 use rand::distributions::{Distribution, Standard};
 
-/// Derive [Rand] for any enum
+/// Derive [Rand] for any enum or struct
 pub use enum_derived_macro::Rand;
 
 /// Generate a random version of the implementor
