@@ -1,6 +1,8 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DataEnum, DataStruct, DataUnion, DeriveInput, Fields, Ident, Variant};
+use syn::{
+    Attribute, Data, DataEnum, DataStruct, DataUnion, DeriveInput, Field, Fields, Ident, Variant,
+};
 
 pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<syn::Error>> {
     // println!("{input:#?}");
@@ -17,48 +19,17 @@ fn expand_derive_rand_struct(
     data_struct: &DataStruct,
 ) -> Result<TokenStream, Vec<syn::Error>> {
     // Create rand func for struct
-    let rand_struct_func = match &data_struct.fields {
-        Fields::Unit => {
-            quote! {
-                    ::std::boxed::Box::new(|| {
-                        #struct_name
-                })
-            }
-        }
-        Fields::Unnamed(unnamed_fields) => {
-            let fields_types = unnamed_fields.unnamed.iter().map(|f| &f.ty);
-            quote! {
-                    ::std::boxed::Box::new(|| {
-                        #struct_name(#(<#fields_types as ::enum_derived::Rand>::rand()),*)
-                })
-            }
-        }
-        Fields::Named(named_fields) => {
-            let fields_types = named_fields.named.iter().map(|f| &f.ty);
-            let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
-            quote! {
-                    ::std::boxed::Box::new(|| {
-                        #struct_name { #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
-                })
-            }
-        }
-    };
+    let struct_ident = quote! { #struct_name };
+    let rand_struct_generator = build_entity_generator(struct_ident, &data_struct.fields);
 
     let expanded = quote! {
         impl ::enum_derived::Rand for #struct_name {
             fn rand() -> Self {
-                #rand_struct_func()
+                (#rand_struct_generator)()
             }
         }
     };
     Ok(TokenStream::from(expanded))
-}
-
-fn expand_derive_rand_union(
-    _union_name: &Ident,
-    _data_union: &DataUnion,
-) -> Result<TokenStream, Vec<syn::Error>> {
-    panic!("Only enums are supported")
 }
 
 fn expand_derive_rand_enum(
@@ -66,11 +37,12 @@ fn expand_derive_rand_enum(
     data_enum: &DataEnum,
 ) -> Result<TokenStream, Vec<syn::Error>> {
     // Cannot be an empty variant
+    // TODO is this necessary?
     if data_enum.variants.is_empty() {
         panic!("Enum must have at least one variant defined");
     }
 
-    let variant_gen = |v: &Variant| variant_rand_func_generator(enum_name, v);
+    let variant_gen = |v: &Variant| variant_generator(enum_name, v);
     let var_rand_funcs = data_enum.variants.iter().map(variant_gen);
 
     let weights = variant_weights_collector(data_enum.variants.iter().cloned().collect::<Vec<_>>());
@@ -103,59 +75,81 @@ fn variant_weights_collector(variants: Vec<Variant>) -> Vec<proc_macro2::TokenSt
                     return attr.tokens.clone();
                 }
             }
-
-            let default_weight = quote! {
-                1
-            };
-            default_weight
+            quote! { 1 }
         })
         .collect()
 }
 
 /// Creates the rand function for a vartiant
-fn variant_rand_func_generator(enum_name: &Ident, variant: &Variant) -> proc_macro2::TokenStream {
-    // Check for custom function
-    for attr in variant.attrs.iter() {
-        let Some(ident) = attr.path.get_ident() else { continue; };
-        // Allow for custom over ride functions to be used
-        if ident == "custom_rand" {
-            let Ok(func_name) = attr.parse_args::<Ident>() else {continue};
-            return quote! {
-                    ::std::boxed::Box::new(|| {
-                        #func_name()
-                })
-            };
-        }
-    }
+fn variant_generator(enum_name: &Ident, variant: &Variant) -> proc_macro2::TokenStream {
+    let variant_generator = match get_attr_value(&variant.attrs, "custom_rand") {
+        Some(f) => f,
+        None => {
+            let var_ident = &variant.ident;
 
-    let var_ident = &variant.ident;
-
-    // Default random function
-    let rand_func = match &variant.fields {
-        Fields::Unit => {
-            quote! {
-                    ::std::boxed::Box::new(|| {
-                        #enum_name::#var_ident
-                })
-            }
-        }
-        Fields::Unnamed(unnamed_fields) => {
-            let fields_types = unnamed_fields.unnamed.iter().map(|f| &f.ty);
-            quote! {
-                    ::std::boxed::Box::new(|| {
-                        #enum_name::#var_ident(#(<#fields_types as ::enum_derived::Rand>::rand()),*)
-                })
-            }
-        }
-        Fields::Named(named_fields) => {
-            let fields_types = named_fields.named.iter().map(|f| &f.ty);
-            let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
-            quote! {
-                    ::std::boxed::Box::new(|| {
-                        #enum_name::#var_ident{ #(#fields_ident: <#fields_types as ::enum_derived::Rand>::rand()),* }
-                })
-            }
+            let full_variant_ident = quote! { #enum_name::#var_ident };
+            build_entity_generator(full_variant_ident, &variant.fields)
         }
     };
-    rand_func
+
+    quote! {
+        ::std::boxed::Box::new(|| {
+            (#variant_generator)()
+        })
+    }
+}
+
+// Returns the generating function
+fn build_entity_generator(
+    entity_name: proc_macro2::TokenStream,
+    fields: &Fields,
+) -> proc_macro2::TokenStream {
+    match fields {
+        Fields::Unit => {
+            quote! { || #entity_name }
+        }
+        Fields::Unnamed(unnamed_fields) => {
+            let fields_rand_generators = unnamed_fields.unnamed.iter().map(get_field_generator);
+            quote! { || #entity_name(#(#fields_rand_generators()),*) }
+        }
+        Fields::Named(named_fields) => {
+            let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
+            let fields_rand_generators = named_fields.named.iter().map(get_field_generator);
+
+            quote! { || #entity_name { #(#fields_ident: #fields_rand_generators()),* } }
+        }
+    }
+}
+
+fn get_field_generator(field: &Field) -> proc_macro2::TokenStream {
+    match get_attr_value(&field.attrs, "custom_rand") {
+        Some(ts) => ts,
+        None => {
+            let field_type = &field.ty;
+            quote! {
+                <#field_type as ::enum_derived::Rand>::rand
+            }
+        }
+    }
+}
+
+fn get_attr_value(attrs: &[Attribute], name: &str) -> Option<proc_macro2::TokenStream> {
+    for attr in attrs.iter() {
+        let Some(ident) = attr.path.get_ident() else { continue; };
+        // Allow for custom over ride functions to be used
+        if ident == name {
+            let Ok(value_func) = attr.parse_args::<Ident>() else {continue};
+            return Some(quote! {
+                #value_func
+            });
+        }
+    }
+    None
+}
+
+fn expand_derive_rand_union(
+    _union_name: &Ident,
+    _data_union: &DataUnion,
+) -> Result<TokenStream, Vec<syn::Error>> {
+    panic!("Union types are not supported")
 }

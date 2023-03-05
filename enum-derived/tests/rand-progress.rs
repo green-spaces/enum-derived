@@ -18,4 +18,7 @@ fn tests() {
     t.pass("tests/rand/16-works-for-struct-with-named-fields.rs");
     t.pass("tests/rand/17-works-for-struct-with-unnamed-fields.rs");
     t.pass("tests/rand/18-works-for-unit-structs.rs");
+    t.pass("tests/rand/19-custom-rand-for-struct-with-named-fields.rs");
+    t.pass("tests/rand/20-custom-rand-for-struct-with-unnamed-fields.rs");
+    t.pass("tests/rand/21-custom-rand-for-enum-with-named-fields-field-level.rs");
 }

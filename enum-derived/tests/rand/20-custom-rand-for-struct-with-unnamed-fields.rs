@@ -3,7 +3,11 @@ use std::collections::HashSet;
 use enum_derived::Rand;
 
 #[derive(Rand)]
-pub struct Hello(u8, #[custom_rand(is_rand)] bool);
+pub struct Hello (
+    u8,
+    #[custom_rand(is_rand)]
+    bool
+);
 
 fn is_rand() -> bool {
     false
