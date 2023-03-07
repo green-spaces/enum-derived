@@ -48,17 +48,17 @@ fn main() {
     let travel_log = TravelLog::rand();
 }
 
-# fn always_has_sunroof() -> TravelLog {
-#     TravelLog::Car { has_sunroof: true }
-# }
-#
-# fn rand_boat_speed() -> u32 {
-#     thread_rng().gen_range(5..50)
-# }
-# 
-# fn rand_temp() -> f32 {
-#    thread_rng().gen_range(-20.0..120.0)
-# }
-# 
-# use rand::{thread_rng, Rng};
+fn always_has_sunroof() -> TravelLog {
+    TravelLog::Car { has_sunroof: true }
+}
+
+fn rand_boat_speed() -> u32 {
+    thread_rng().gen_range(5..50)
+}
+
+fn rand_temp() -> f32 {
+   thread_rng().gen_range(-20.0..120.0)
+}
+
+use rand::{thread_rng, Rng};
  ```
