@@ -14,7 +14,7 @@ pub enum RandomWeights {
     Two,
     #[weight(3)]
     Three,
-    #[custom_rand(|| RandomWeights::Four)]
+    #[custom_rand(|_rng| RandomWeights::Four)]
     #[weight(4)]
     Four,
 }

@@ -11,7 +11,7 @@ pub enum Messages {
     Bil,
 }
 
-fn stamped() -> bool {
+fn stamped(_rng: &mut impl rand::Rng) -> bool {
     true
 }
 

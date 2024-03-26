@@ -9,7 +9,7 @@ pub struct Hello {
     is_rand: bool
 }
 
-fn is_rand() -> bool {
+fn is_rand(_rng: &mut impl rand::Rng) -> bool {
     false
 }
 

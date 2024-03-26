@@ -4,7 +4,7 @@ use syn::{
     Attribute, Data, DataEnum, DataStruct, DataUnion, DeriveInput, Field, Fields, Ident, Variant,
 };
 
-pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<syn::Error>> {
+pub fn expand_derive_rand(input: &DeriveInput) -> Result<TokenStream, Vec<syn::Error>> {
     // println!("{input:#?}");
 
     match input.data {
@@ -24,8 +24,8 @@ fn expand_derive_rand_struct(
 
     let expanded = quote! {
         impl ::enum_derived::Rand for #struct_name {
-            fn rand() -> Self {
-                (#rand_struct_generator)()
+            fn rand_ext<R: ::rand::Rng>(rng: &mut R) -> Self {
+                (#rand_struct_generator)(rng)
             }
         }
     };
@@ -49,15 +49,15 @@ fn expand_derive_rand_enum(
 
     let expanded = quote! {
         impl ::enum_derived::Rand for #enum_name {
-            fn rand() -> Self {
-                use ::rand::{thread_rng, Rng, distributions::{WeightedIndex, Distribution}};
+            fn rand_ext<R: ::rand::Rng>(rng: &mut R) -> Self {
+                use ::rand::{Rng, distributions::{WeightedIndex, Distribution}};
 
-                let mut random_enums: Vec<Box<dyn Fn() -> Self>> = vec![#(#var_rand_funcs),*];
+                let mut random_enums: Vec<Box<dyn Fn(&mut R) -> Self>> = vec![#(#var_rand_funcs),*];
                 let enum_weights = vec![#(#weights),*];
                 let dist = WeightedIndex::new(&enum_weights).unwrap();
 
-                let enum_idx: usize = dist.sample(&mut thread_rng());
-                (*random_enums.swap_remove(enum_idx))()
+                let enum_idx: usize = dist.sample(&mut *rng);
+                (*random_enums.swap_remove(enum_idx))(&mut *rng)
             }
         }
     };
@@ -93,8 +93,8 @@ fn variant_generator(enum_name: &Ident, variant: &Variant) -> proc_macro2::Token
     };
 
     quote! {
-        ::std::boxed::Box::new(|| {
-            (#variant_generator)()
+        ::std::boxed::Box::new(|rng| {
+            (#variant_generator)(rng)
         })
     }
 }
@@ -106,17 +106,17 @@ fn build_entity_generator(
 ) -> proc_macro2::TokenStream {
     match fields {
         Fields::Unit => {
-            quote! { || #entity_name }
+            quote! { |_rng| #entity_name }
         }
         Fields::Unnamed(unnamed_fields) => {
             let fields_rand_generators = unnamed_fields.unnamed.iter().map(get_field_generator);
-            quote! { || #entity_name(#(#fields_rand_generators()),*) }
+            quote! { |rng: &mut R| #entity_name(#(#fields_rand_generators(&mut *rng)),*) }
         }
         Fields::Named(named_fields) => {
             let fields_ident = named_fields.named.iter().map(|f| f.ident.clone().unwrap());
             let fields_rand_generators = named_fields.named.iter().map(get_field_generator);
 
-            quote! { || #entity_name { #(#fields_ident: #fields_rand_generators()),* } }
+            quote! { |rng: &mut R| #entity_name { #(#fields_ident: #fields_rand_generators(&mut *rng)),* } }
         }
     }
 }
@@ -127,7 +127,7 @@ fn get_field_generator(field: &Field) -> proc_macro2::TokenStream {
         None => {
             let field_type = &field.ty;
             quote! {
-                <#field_type as ::enum_derived::Rand>::rand
+                <#field_type as ::enum_derived::Rand>::rand_ext
             }
         }
     }
@@ -135,10 +135,14 @@ fn get_field_generator(field: &Field) -> proc_macro2::TokenStream {
 
 fn get_attr_value(attrs: &[Attribute], name: &str) -> Option<proc_macro2::TokenStream> {
     for attr in attrs.iter() {
-        let Some(ident) = attr.path.get_ident() else { continue; };
+        let Some(ident) = attr.path.get_ident() else {
+            continue;
+        };
         // Allow for custom over ride functions to be used
         if ident == name {
-            let Ok(value_func) = attr.parse_args::<Ident>() else {continue};
+            let Ok(value_func) = attr.parse_args::<Ident>() else {
+                continue;
+            };
             return Some(quote! {
                 #value_func
             });
