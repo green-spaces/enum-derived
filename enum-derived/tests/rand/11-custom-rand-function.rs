@@ -5,12 +5,11 @@ use rand::{thread_rng, Rng};
 
 const MAX_AGE: u8 = 120;
 
-fn rand_float() -> RandomTypes {
+fn rand_float(_rng: &mut impl Rng) -> RandomTypes {
     RandomTypes::FloatingPoint(0.0, 0.0)
 }
 
-fn rand_age() -> RandomTypes {
-    let mut rng = thread_rng();
+fn rand_age(_rng: &mut impl Rng) -> RandomTypes {
     RandomTypes::Age(rng.gen_range(0..MAX_AGE))
 }
 
