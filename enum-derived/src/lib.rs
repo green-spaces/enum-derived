@@ -10,11 +10,8 @@ use rand::{
 pub use enum_derived_macro::Rand;
 
 /// Generate a random version of the implementor
-pub trait Rand {
-    fn rand() -> Self
-    where
-        Self: std::marker::Sized,
-    {
+pub trait Rand: Sized {
+    fn rand() -> Self {
         Self::rand_ext(&mut thread_rng())
     }
 
