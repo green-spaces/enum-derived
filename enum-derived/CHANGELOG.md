@@ -5,6 +5,7 @@
 Updates to the Rand trait:
 - Support for Strings (defaults to lengths betwen 1 and 64)
 - Support for Vec<T> where T implments Rand (defaults to lengths betwen 1 and 64)
+- Added unsafe code for generating random arrays
 
 ### Removed
 
