@@ -14,6 +14,16 @@ pub trait Rand {
     fn rand() -> Self;
 }
 
+impl<T: Rand> Rand for Option<T> {
+    fn rand() -> Self {
+        if bool::rand() {
+            Some(T::rand())
+        } else {
+            None
+        }
+    }
+}
+
 impl<T: Rand> Rand for Vec<T> {
     fn rand() -> Self {
         let size = (rand::random::<usize>() % 63) + 1;
