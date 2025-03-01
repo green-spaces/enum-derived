@@ -19,7 +19,8 @@ The [rand] crate's [rand::random] method is used for the default implementation 
 
 ### Note
 
-Support for String and Vec<T> has been added. The default implementation will generate a String/Vec with a lenght between 1 and 64 elements.
+Support for String, Vec<T>, HashMap<K, V>, and HashSet<K> has been added. The implementation for String and Vec will create an instance with a lenght between 1 and 64 elements. The implementation for HashMap and HashSet will create an instance with 1 to 16 elements. 
+
 
 ## Example
 
