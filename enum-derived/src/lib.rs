@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 
 use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
     mem::{self, MaybeUninit},
     num::{NonZeroU128, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize, Wrapping},
 };
@@ -11,6 +13,31 @@ pub use enum_derived_macro::Rand;
 /// Generate a random version of the implementor
 pub trait Rand {
     fn rand() -> Self;
+}
+
+impl<K: Rand + Hash + Eq, V: Rand> Rand for HashMap<K, V> {
+    fn rand() -> Self {
+        let mut map = HashMap::new();
+        let size = (rand::random::<usize>() % 15) + 1;
+        for _ in 0..size {
+            let k = K::rand();
+            let v = V::rand();
+            let _ = map.insert(k, v);
+        }
+        map
+    }
+}
+
+impl<K: Rand + Hash + Eq> Rand for HashSet<K> {
+    fn rand() -> Self {
+        let mut set = HashSet::new();
+        let size = (rand::random::<usize>() % 15) + 1;
+        for _ in 0..size {
+            let k = K::rand();
+            let _ = set.insert(k);
+        }
+        set
+    }
 }
 
 impl<T: Rand> Rand for Option<T> {
