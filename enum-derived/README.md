@@ -1,10 +1,13 @@
 # Enum-Derived
 
-Use Enum-Derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
+Use enum-derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
 
 Need custom constraints applied to a variant or field? Use the `#[custom_rand(your_function)]` attribute to override the default behavior or extend support to types without default support.
 
 Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)]` to change the distribution.
+
+[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
+![Build](https://github.com/green-spaces/enum-derived/actions/workflows/build.yml/badge.svg?branch=main)
 
 ---
 
@@ -16,7 +19,8 @@ The [rand] crate's [rand::random] method is used for the default implementation 
 
 ### Note
 
-Support for String and Vec<T> has been added. The default implementation will generate a String/Vec with a lenght between 1 and 64 elements.
+Support for String, Vec<T>, HashMap<K, V>, and HashSet<K> has been added. The implementation for String and Vec will create an instance with a lenght between 1 and 64 elements. The implementation for HashMap and HashSet will create an instance with 1 to 16 elements. 
+
 
 ## Example
 

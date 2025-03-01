@@ -1,10 +1,13 @@
 # Enum-Derived
 
-Use Enum-Derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
+Use enum-derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
 
 Need custom constraints applied to a variant or field? Use the `#[custom_rand(your_function)]` attribute to override the default behavior or extend support to types without default support.
 
 Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)]` to change the distribution.
+
+[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
+![Build](https://github.com/green-spaces/enum-derived/actions/workflows/build.yml/badge.svg?branch=main)
 
 ---
 
@@ -12,7 +15,14 @@ Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)
 
 Rand allows for a random variant of an enum, or struct, to be generated.
 
-The [rand] crates [rand::random] method is used for the default implementation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionality.
+The [rand] crate's [rand::random] method is used for the default implementation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionality.
+
+### Note
+
+Support for String, Vec<T>, HashMap<K, V>, and HashSet<K> has been added. The implementation for String and Vec will create an instance with a lenght between 1 and 64 elements. The implementation for HashMap and HashSet will create an instance with 1 to 16 elements. 
+
+
+## Example
 
 ```rust
 use enum_derived::Rand;
@@ -22,11 +32,12 @@ struct Weather {
     wind_speed: u8,
     #[custom_rand(rand_temp)]
     temperature: f32,
-    cloudy: bool
+    cloudy: bool,
+    location: String,
 }
 
 #[derive(Rand)]
-enum TravelLog {
+enum TravelLogEntry {
     Airplane {
         weather: Weather,
         altitude: u16
@@ -43,22 +54,24 @@ enum TravelLog {
     #[weight(3)]
     SpaceShip,
 }
+#[derive(Rand)]
+pub struct TravelLog(Vec<TravelLogEntry>);
 
 fn main() {
     let travel_log = TravelLog::rand();
 }
 
-fn always_has_sunroof() -> TravelLog {
-    TravelLog::Car { has_sunroof: true }
-}
-
-fn rand_boat_speed() -> u32 {
-    thread_rng().gen_range(5..50)
-}
-
-fn rand_temp() -> f32 {
-   thread_rng().gen_range(-20.0..120.0)
-}
-
-use rand::{thread_rng, Rng};
+# fn always_has_sunroof() -> TravelLogEntry {
+#     TravelLogEntry::Car { has_sunroof: true }
+# }
+#
+# fn rand_boat_speed() -> u32 {
+#     thread_rng().gen_range(5..50)
+# }
+# 
+# fn rand_temp() -> f32 {
+#    thread_rng().gen_range(-20.0..120.0)
+# }
+# 
+# use rand::{thread_rng, Rng};
  ```
