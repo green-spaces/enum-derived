@@ -2,7 +2,7 @@
 
 use std::{
     mem::{self, MaybeUninit},
-    num::{NonZeroU128, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize},
+    num::{NonZeroU128, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize, Wrapping},
 };
 
 /// Derive [Rand] for any enum or struct
@@ -20,6 +20,12 @@ impl<T: Rand> Rand for Option<T> {
         } else {
             None
         }
+    }
+}
+
+impl<T: Rand> Rand for Wrapping<T> {
+    fn rand() -> Self {
+        Wrapping(T::rand())
     }
 }
 
