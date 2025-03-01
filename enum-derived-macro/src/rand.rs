@@ -135,10 +135,14 @@ fn get_field_generator(field: &Field) -> proc_macro2::TokenStream {
 
 fn get_attr_value(attrs: &[Attribute], name: &str) -> Option<proc_macro2::TokenStream> {
     for attr in attrs.iter() {
-        let Some(ident) = attr.path.get_ident() else { continue; };
+        let Some(ident) = attr.path.get_ident() else {
+            continue;
+        };
         // Allow for custom over ride functions to be used
         if ident == name {
-            let Ok(value_func) = attr.parse_args::<Ident>() else {continue};
+            let Ok(value_func) = attr.parse_args::<Ident>() else {
+                continue;
+            };
             return Some(quote! {
                 #value_func
             });

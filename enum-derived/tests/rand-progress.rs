@@ -21,4 +21,5 @@ fn tests() {
     t.pass("tests/rand/19-custom-rand-for-struct-with-named-fields.rs");
     t.pass("tests/rand/20-custom-rand-for-struct-with-unnamed-fields.rs");
     t.pass("tests/rand/21-custom-rand-for-enum-with-named-fields-field-level.rs");
+    t.pass("tests/rand/22-custom-rand-struct-with-string.rs");
 }
