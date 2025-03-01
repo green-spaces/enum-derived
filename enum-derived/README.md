@@ -1,10 +1,13 @@
 # Enum-Derived
 
-Use Enum-Derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
+Use enum-derived's Rand macro to generate random variants of your enums and structs. All fields are populated with independent random values.
 
 Need custom constraints applied to a variant or field? Use the `#[custom_rand(your_function)]` attribute to override the default behavior or extend support to types without default support.
 
 Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)]` to change the distribution.
+
+[![crates.io](https://img.shields.io/crates/v/enum-derived.svg)](https://crates.io/crates/enum-derived)
+![Build](https://github.com/green-spaces/enum-derived/actions/workflows/build.yml/badge.svg?branch=main)
 
 ---
 

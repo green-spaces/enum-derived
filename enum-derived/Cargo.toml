@@ -7,7 +7,7 @@ edition = "2021"
 repository = "https://github.com/green-spaces/enum-derived"
 documentation = "https://docs.rs/enum-derived"
 keywords = ["enum", "random", "rand", "derive", "struct"]
-readme = "crates-io.md"
+readme = "README.md"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
