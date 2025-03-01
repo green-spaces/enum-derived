@@ -12,7 +12,13 @@ Need some variants to be generated more ofter? Use the `#[weight(VARIANT_WEIGHT)
 
 Rand allows for a random variant of an enum, or struct, to be generated.
 
-The [rand] crates [rand::random] method is used for the default implementation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionality.
+The [rand] crate's [rand::random] method is used for the default implementation of [Rand]. Unsupported variants can us the `#[custom_rand(your_function)]` to extend the functionality.
+
+### Note
+
+Support for String and Vec<T> has been added. The default implementation will generate a String/Vec with a lenght between 1 and 64 elements.
+
+## Example
 
 ```rust
 use enum_derived::Rand;
@@ -22,11 +28,12 @@ struct Weather {
     wind_speed: u8,
     #[custom_rand(rand_temp)]
     temperature: f32,
-    cloudy: bool
+    cloudy: bool,
+    location: String,
 }
 
 #[derive(Rand)]
-enum TravelLog {
+enum TravelLogEntry {
     Airplane {
         weather: Weather,
         altitude: u16
@@ -43,13 +50,15 @@ enum TravelLog {
     #[weight(3)]
     SpaceShip,
 }
+#[derive(Rand)]
+pub struct TravelLog(Vec<TravelLogEntry>);
 
 fn main() {
     let travel_log = TravelLog::rand();
 }
 
-# fn always_has_sunroof() -> TravelLog {
-#     TravelLog::Car { has_sunroof: true }
+# fn always_has_sunroof() -> TravelLogEntry {
+#     TravelLogEntry::Car { has_sunroof: true }
 # }
 #
 # fn rand_boat_speed() -> u32 {

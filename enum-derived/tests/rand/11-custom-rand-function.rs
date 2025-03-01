@@ -14,6 +14,11 @@ fn rand_age() -> RandomTypes {
     RandomTypes::Age(rng.gen_range(0..MAX_AGE))
 }
 
+fn empty_vec() -> RandomTypes {
+    RandomTypes::Times(Vec::new())
+}
+
+
 #[derive(Rand)]
 pub enum RandomTypes {
     Empty,
@@ -22,6 +27,8 @@ pub enum RandomTypes {
     FloatingPoint(f32, f64),
     #[custom_rand(rand_age)]
     Age(u8),
+    #[custom_rand(empty_vec)]
+    Times(Vec<u8>),
 }
 
 fn main() {
@@ -36,6 +43,9 @@ fn main() {
             },
             RandomTypes::Age(age) => {
                 assert!(age <= MAX_AGE);
+            }
+            RandomTypes::Times(ref elems) => {
+                assert!(elems.is_empty());
             }
             _ => {}
         }
