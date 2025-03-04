@@ -54,6 +54,7 @@ enum TravelLogEntry {
     #[weight(3)]
     SpaceShip,
 }
+
 #[derive(Rand)]
 pub struct TravelLog(Vec<TravelLogEntry>);
 

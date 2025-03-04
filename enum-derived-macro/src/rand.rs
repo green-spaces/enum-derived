@@ -5,8 +5,6 @@ use syn::{
 };
 
 pub fn expand_derive_rand(input: &mut DeriveInput) -> Result<TokenStream, Vec<syn::Error>> {
-    // println!("{input:#?}");
-
     match input.data {
         Data::Struct(ref data_struct) => expand_derive_rand_struct(&input.ident, data_struct),
         Data::Enum(ref data_enum) => expand_derive_rand_enum(&input.ident, data_enum),
@@ -50,7 +48,7 @@ fn expand_derive_rand_enum(
     let expanded = quote! {
         impl ::enum_derived::Rand for #enum_name {
             fn rand() -> Self {
-                use ::rand::{thread_rng, Rng, distributions::{WeightedIndex, Distribution}};
+                use ::enum_derived::__rand::{thread_rng, Rng, distributions::{WeightedIndex, Distribution}};
 
                 let mut random_enums: Vec<Box<dyn Fn() -> Self>> = vec![#(#var_rand_funcs),*];
                 let enum_weights = vec![#(#weights),*];

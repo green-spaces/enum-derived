@@ -1,5 +1,5 @@
 [workspace]
 members = [
     "enum-derived",
-    "enum-derived-macro",
+    "enum-derived-macro", "enum-derived-test-crate",
 ]
