@@ -25,6 +25,7 @@ Support for String, Vec<T>, HashMap<K, V>, and HashSet<K> has been added. The im
 ## Example
 
 ```rust
+use rand::{thread_rng, Rng};
 use enum_derived::Rand;
 
 #[derive(Rand)]
@@ -60,5 +61,17 @@ pub struct TravelLog(Vec<TravelLogEntry>);
 
 fn sample_rand_call() {
     let travel_log = TravelLog::rand();
+}
+
+fn always_has_sunroof() -> TravelLogEntry {
+    TravelLogEntry::Car { has_sunroof: true }
+}
+
+fn rand_boat_speed() -> u32 {
+    thread_rng().gen_range(5..50)
+}
+
+fn rand_temp() -> f32 {
+   thread_rng().gen_range(-20.0..120.0)
 }
  ```
