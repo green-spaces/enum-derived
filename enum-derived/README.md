@@ -19,12 +19,13 @@ The [rand] crate's [rand::random] method is used for the default implementation 
 
 ### Note
 
-Support for String, Vec<T>, HashMap<K, V>, and HashSet<K> has been added. The implementation for String and Vec will create an instance with a lenght between 1 and 64 elements. The implementation for HashMap and HashSet will create an instance with 1 to 16 elements. 
+Support for String, Vec<T>, HashMap<K, V>, and HashSet<K> has been added. The implementation for String and Vec<T> will create an instance with a lenght between 1 and 64 elements. The implementation for HashMap and HashSet will create an instance with 1 to 16 elements. 
 
 
 ## Example
 
 ```rust
+use rand::{thread_rng, Rng};
 use enum_derived::Rand;
 
 #[derive(Rand)]
@@ -54,24 +55,23 @@ enum TravelLogEntry {
     #[weight(3)]
     SpaceShip,
 }
+
 #[derive(Rand)]
 pub struct TravelLog(Vec<TravelLogEntry>);
 
-fn main() {
+fn sample_rand_call() {
     let travel_log = TravelLog::rand();
 }
 
-# fn always_has_sunroof() -> TravelLogEntry {
-#     TravelLogEntry::Car { has_sunroof: true }
-# }
-#
-# fn rand_boat_speed() -> u32 {
-#     thread_rng().gen_range(5..50)
-# }
-# 
-# fn rand_temp() -> f32 {
-#    thread_rng().gen_range(-20.0..120.0)
-# }
-# 
-# use rand::{thread_rng, Rng};
+fn always_has_sunroof() -> TravelLogEntry {
+    TravelLogEntry::Car { has_sunroof: true }
+}
+
+fn rand_boat_speed() -> u32 {
+    thread_rng().gen_range(5..50)
+}
+
+fn rand_temp() -> f32 {
+   thread_rng().gen_range(-20.0..120.0)
+}
  ```

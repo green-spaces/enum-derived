@@ -1,3 +1,16 @@
+# 0.9.2 (March 3st 2025)
+
+### Added
+
+- Updated docs
+- Added re-export of rand crate so that consumers do not have to import it in their cargo.toml
+
+# 0.9.1 (March 1st 2025)
+
+### Added
+
+- Updated docs
+
 # 0.9.0 (March 1st 2025)
 
 ### Added

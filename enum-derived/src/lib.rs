@@ -7,6 +7,9 @@ use std::{
     num::{NonZeroU128, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize, Wrapping},
 };
 
+#[doc(hidden)]
+pub use rand as __rand;
+
 /// Derive [Rand] for any enum or struct
 pub use enum_derived_macro::Rand;
 
