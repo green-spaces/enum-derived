@@ -34,6 +34,10 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
+      - run: cargo publish -p enum-derived-macro --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
       - run: cargo publish -p enum-derived --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

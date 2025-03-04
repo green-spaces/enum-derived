@@ -58,7 +58,7 @@ enum TravelLogEntry {
 #[derive(Rand)]
 pub struct TravelLog(Vec<TravelLogEntry>);
 
-fn main() {
+fn sample_rand_call() {
     let travel_log = TravelLog::rand();
 }
  ```
